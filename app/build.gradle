@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.ainirobot.robotos'
+    namespace 'com.evodesign.buttontest'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.ainirobot.robotos"
+        applicationId "com.evodesign.buttontest"
         minSdk 24
         targetSdk 34
         versionCode 1

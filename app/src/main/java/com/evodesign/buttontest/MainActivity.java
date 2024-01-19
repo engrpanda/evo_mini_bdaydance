@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.ainirobot.coreservice.client.RobotApi;
 import com.ainirobot.coreservice.client.listener.CommandListener;
-import com.ainirobot.robotos.R;
+import com.evodesign.buttontest.R;
 
 import android.os.Handler;
 public class MainActivity extends AppCompatActivity {
