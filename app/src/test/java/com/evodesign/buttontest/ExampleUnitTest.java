@@ -1,4 +1,4 @@
-package com.ainirobot.robotos;
+package com.evodesign.buttontest;
 
 import org.junit.Test;
 

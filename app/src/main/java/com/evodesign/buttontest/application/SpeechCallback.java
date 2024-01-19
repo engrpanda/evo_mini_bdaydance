@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.ainirobot.robotos.application;
+package com.evodesign.buttontest.application;
 
 import android.os.RemoteException;
 
