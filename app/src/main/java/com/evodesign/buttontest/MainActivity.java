@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         Button buttonB = findViewById(R.id.buttonB);
         Button dance = findViewById(R.id.dance);
         Button stop = findViewById(R.id.stop);
+        Button back = findViewById(R.id.backButton);
 
         dance.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,6 +183,16 @@ public class MainActivity extends AppCompatActivity {
                 RobotApi.getInstance().moveHead(reqId++, "relative", "relative", 0, 10, mMotionListener);
             }
         });
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle back button click
+                showToast("Exiting");
+                finish(); // Close the activity
+            }
+        });
+
     }
 
     private CommandListener mMotionListener = new CommandListener() {
