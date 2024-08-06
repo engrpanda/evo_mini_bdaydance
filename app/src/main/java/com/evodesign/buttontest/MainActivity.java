@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 showToast("Start Dancing");
 
                 // Initialize MediaPlayer
-                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.happybday);
+                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.hbdeng);
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
     private void startDance() {
         handler = new Handler();
         final int[] movements = {0, 1, 2, 3, 4, 5}; // Sequence of movements
-        final int interval = 500; // Interval between movements in milliseconds
+        final int interval = 1000; // Interval between movements in milliseconds
         final int movementCount = movements.length;
 
         handler.post(new Runnable() {
@@ -220,21 +220,27 @@ public class MainActivity extends AppCompatActivity {
                 if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                     switch (movements[currentMovement % movementCount]) {
                         case 0:
-                            RobotApi.getInstance().goForward(0, 0.2f, mMotionListener);
-                            break;
-                        case 1:
-                            RobotApi.getInstance().goBackward(0, 0.2f, mMotionListener);
-                            break;
-                        case 2:
-                            RobotApi.getInstance().turnLeft(0, 40, mMotionListener);
-                            break;
-                        case 3:
+                            showToast("turn right");
                             RobotApi.getInstance().turnRight(0, 40, mMotionListener);
                             break;
+                        case 1:
+                            showToast("turn left");
+                            RobotApi.getInstance().turnLeft(0, 40, mMotionListener);
+                            break;
+                        case 2:
+                            showToast("forward");
+                            RobotApi.getInstance().goForward(0, 0.4f, mMotionListener);
+                            break;
+                        case 3:
+                            showToast("backward");
+                            RobotApi.getInstance().goBackward(0, 0.1f, mMotionListener);
+                            break;
                         case 4:
+                            showToast("head down");
                             RobotApi.getInstance().moveHead(reqId++, "relative", "relative", 0, -10, mMotionListener);
                             break;
                         case 5:
+                            showToast("head up");
                             RobotApi.getInstance().moveHead(reqId++, "relative", "relative", 0, 10, mMotionListener);
                             break;
                     }
