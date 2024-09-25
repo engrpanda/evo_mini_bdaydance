@@ -1,270 +1,138 @@
 package com.evodesign.buttontest;
 
-import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.MotionEvent;
+import android.widget.Toast;
+import android.widget.VideoView;
+import android.widget.MediaController;
+import android.util.Log;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.ainirobot.coreservice.client.RobotApi;
 import com.ainirobot.coreservice.client.listener.CommandListener;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static int reqId = 0;
-    private MediaPlayer mediaPlayer;
+    private VideoView videoView;
     private Handler handler;
+    private boolean isDancing = false; // Track if dancing is in progress
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button upButton = findViewById(R.id.upButton);
-        Button leftButton = findViewById(R.id.leftButton);
-        Button rightButton = findViewById(R.id.rightButton);
-        Button downButton = findViewById(R.id.downButton);
-        Button buttonA = findViewById(R.id.buttonA);
-        Button buttonB = findViewById(R.id.buttonB);
-        Button dance = findViewById(R.id.dance);
-        Button stop = findViewById(R.id.stop);
-        Button back = findViewById(R.id.backButton);
+        // Initialize VideoView and MediaController
+        videoView = findViewById(R.id.videoView);
+        MediaController mediaController = new MediaController(this);
+        videoView.setMediaController(mediaController);
 
-        dance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle dance button click
-                showToast("Start Dancing");
+        // Set the video URI
+        Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.bdayvideo);
+        videoView.setVideoURI(videoUri);
 
-                // Initialize MediaPlayer
-                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.hbdeng);
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        // Stop the robot when the music is done
-                        RobotApi.getInstance().stopMove(0, mMotionListener);
-                        // Release the MediaPlayer
-                        mediaPlayer.release();
-                        mediaPlayer = null;
-                    }
-                });
+        videoView.setOnCompletionListener(mp -> stopDance()); // Stop dancing when video completes
 
-                // Start playing the music
-                mediaPlayer.start();
+        // Initialize Start button
+        Button startButton = findViewById(R.id.startButton);
+        startButton.setOnClickListener(v -> startDance());
 
-                // Start the dance sequence
-                startDance();
-            }
-        });
+        // Initialize Stop button
+        Button stopButton = findViewById(R.id.stop);
+        stopButton.setOnClickListener(v -> stopDance());
 
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle stop button click
-                showToast("Stop Dancing");
-                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    mediaPlayer = null;
-                }
-                RobotApi.getInstance().stopMove(0, mMotionListener);
-                if (handler != null) {
-                    handler.removeCallbacksAndMessages(null);
-                }
-            }
-        });
-
-        upButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Handle button press (start moving forward)
-                        showToast("forward");
-                        RobotApi.getInstance().goForward(0, 0.4f, mMotionListener);
-                        return true; // Consume the event to prevent multiple ACTION_DOWN events
-
-                    case MotionEvent.ACTION_UP:
-                        // Handle button release (stop moving)
-                        showToast("stop");
-                        RobotApi.getInstance().stopMove(0, mMotionListener);
-                        return true;
-
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        leftButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Handle button press (start turning left)
-                        showToast("turn left");
-                        RobotApi.getInstance().turnLeft(0, 40, mMotionListener);
-                        return true; // Consume the event to prevent multiple ACTION_DOWN events
-
-                    case MotionEvent.ACTION_UP:
-                        // Handle button release (stop moving)
-                        showToast("stop");
-                        RobotApi.getInstance().stopMove(0, mMotionListener);
-                        return true;
-
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        rightButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Handle button press (start turning right)
-                        showToast("turn right");
-                        RobotApi.getInstance().turnRight(0, 40, mMotionListener);
-                        return true; // Consume the event to prevent multiple ACTION_DOWN events
-
-                    case MotionEvent.ACTION_UP:
-                        // Handle button release (stop moving)
-                        showToast("stop");
-                        RobotApi.getInstance().stopMove(0, mMotionListener);
-                        return true;
-
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        downButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Handle button press (start moving backward)
-                        showToast("backward");
-                        RobotApi.getInstance().goBackward(0, 0.1f, mMotionListener);
-                        return true; // Consume the event to prevent multiple ACTION_DOWN events
-
-                    case MotionEvent.ACTION_UP:
-                        // Handle button release (stop moving)
-                        showToast("stop");
-                        RobotApi.getInstance().stopMove(0, mMotionListener);
-                        return true;
-
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        buttonA.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle A button click
-                showToast("A button clicked");
-                RobotApi.getInstance().moveHead(reqId++, "relative", "relative", 0, -10, mMotionListener);
-            }
-        });
-
-        buttonB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle B button click
-                showToast("B button clicked");
-                RobotApi.getInstance().moveHead(reqId++, "relative", "relative", 0, 10, mMotionListener);
-            }
-        });
-
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle back button click
-                showToast("Exiting");
-                finish(); // Close the activity
-            }
-        });
-
+        // Initialize Back button
+        Button backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
     }
 
+    private void startDance() {
+        if (!isDancing) { // Ensure we're not already dancing
+            isDancing = true; // Set dancing flag
+
+            // Reset video to the start and play it from the beginning
+            videoView.seekTo(0);
+            videoView.start();
+
+            // Start the robot dance routine
+            startDanceRoutine();
+        }
+    }
+
+    private void startDanceRoutine() {
+        handler = new Handler();
+        final int interval = 2000; // 2 seconds delay
+
+        handler.post(new Runnable() {
+            private boolean turnRight = true; // Track which direction the robot should move
+
+            @Override
+            public void run() {
+                if (!isDancing) { // Stop dancing if not in progress
+                    return;
+                }
+
+                if (turnRight) {
+                    RobotApi.getInstance().turnRight(0, 40, mMotionListener);
+                    Log.d("DanceRoutine", "Turning Right");
+                } else {
+                    RobotApi.getInstance().turnLeft(0, 40, mMotionListener);
+                    Log.d("DanceRoutine", "Turning Left");
+                }
+
+                // Toggle direction for next iteration
+                turnRight = !turnRight;
+
+                // Schedule next movement after 2 seconds
+                handler.postDelayed(this, interval);
+            }
+        });
+    }
+
+    // Listener to handle robot motion events
     private CommandListener mMotionListener = new CommandListener() {
         @Override
         public void onResult(int result, String message) {
+            Log.d("MovementListener", "Result: " + result + ", Message: " + message);
             if ("succeed".equals(message)) {
-                // Handle success
+                Log.d("DanceRoutine", "Movement succeeded");
             } else {
-                // Handle failure
+                Log.d("DanceRoutine", "Movement failed: " + result);
             }
         }
     };
 
-    private void startDance() {
-        handler = new Handler();
-        final int[] movements = {0, 1, 2, 3, 4, 5}; // Sequence of movements
-        final int interval = 1000; // Interval between movements in milliseconds
-        final int movementCount = movements.length;
+    // Stop the dance and clean up
+    private void stopDance() {
+        showToast("Stop Dancing");
+        isDancing = false; // Reset the dancing flag
 
-        handler.post(new Runnable() {
-            int currentMovement = 0;
+        if (videoView.isPlaying()) {
+            videoView.pause();  // Pause the video if it's playing
+            videoView.seekTo(0); // Reset video to the start
+        }
 
-            @Override
-            public void run() {
-                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                    switch (movements[currentMovement % movementCount]) {
-                        case 0:
-                            showToast("turn right");
-                            RobotApi.getInstance().turnRight(0, 40, mMotionListener);
-                            break;
-                        case 1:
-                            showToast("turn left");
-                            RobotApi.getInstance().turnLeft(0, 40, mMotionListener);
-                            break;
-                        case 2:
-                            showToast("forward");
-                            RobotApi.getInstance().goForward(0, 0.4f, mMotionListener);
-                            break;
-                        case 3:
-                            showToast("backward");
-                            RobotApi.getInstance().goBackward(0, 0.1f, mMotionListener);
-                            break;
-                        case 4:
-                            showToast("head down");
-                            RobotApi.getInstance().moveHead(reqId++, "relative", "relative", 0, -10, mMotionListener);
-                            break;
-                        case 5:
-                            showToast("head up");
-                            RobotApi.getInstance().moveHead(reqId++, "relative", "relative", 0, 10, mMotionListener);
-                            break;
-                    }
-
-                    currentMovement++;
-                    handler.postDelayed(this, interval);
-                } else {
-                    // Stop the robot after the music is done
-                    RobotApi.getInstance().stopMove(0, mMotionListener);
-                }
-            }
-        });
+        stopMovement();
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+            handler = null; // Clear handler reference
+        }
     }
 
+    private void stopMovement() {
+        RobotApi.getInstance().stopMove(0, mMotionListener);
+    }
+
+    // Show toast message
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onDestroy() {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
+        stopDance(); // Ensure the dance stops when the activity is destroyed
         super.onDestroy();
     }
 }

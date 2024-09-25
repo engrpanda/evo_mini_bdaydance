@@ -7,76 +7,31 @@
     android:layout_height="match_parent"
     tools:context="com.evodesign.buttontest.MainActivity">
 
-    <Button
-        android:id="@+id/upButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="↑"
-        android:layout_marginTop="40dp"
-        android:layout_marginLeft="100dp"/>
-
-    <Button
-        android:id="@+id/leftButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="←"
-        android:layout_marginTop="82dp"
-        android:layout_marginLeft="10dp"/>
-
-    <Button
-        android:id="@+id/rightButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="→"
-        android:layout_marginTop="82dp"
-        android:layout_marginLeft="190dp"/>
-
-    <Button
-        android:id="@+id/downButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="↓"
-        android:layout_marginTop="125dp"
-        android:layout_marginLeft="100dp"/>
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerInParent="true"
+        />
 
     <Button
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="back"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="15dp"/>
-
-    <Button
-        android:id="@+id/dance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="dance"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="110dp"/>
+        android:text="back" />
 
     <Button
         android:id="@+id/stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="stop"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="210dp"/>
+        android:layout_marginLeft="200dp"/>
 
     <Button
-        android:id="@+id/buttonA"
+        android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="A"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"/>
-
-    <Button
-        android:id="@+id/buttonB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="B"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="190dp"/>
+        android:text="Start"
+        android:layout_marginLeft="100dp"/>
 
 </RelativeLayout>
