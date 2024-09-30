@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private VideoView videoView;
     private Handler handler;
     private boolean isDancing = false; // Track if dancing is in progress
+    private Button toggleButton; // Button to start and stop dancing
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,16 @@ public class MainActivity extends AppCompatActivity {
 
         videoView.setOnCompletionListener(mp -> stopDance()); // Stop dancing when video completes
 
-        // Initialize Start button
-        Button startButton = findViewById(R.id.startButton);
-        startButton.setOnClickListener(v -> startDance());
-
-        // Initialize Stop button
-        Button stopButton = findViewById(R.id.stop);
-        stopButton.setOnClickListener(v -> stopDance());
+        // Initialize the toggle button (Start/Stop button)
+        toggleButton = findViewById(R.id.toggleButton);
+        toggleButton.setText("Start"); // Set initial text to "Start Dancing"
+        toggleButton.setOnClickListener(v -> {
+            if (isDancing) {
+                stopDance();
+            } else {
+                startDance();
+            }
+        });
 
         // Initialize Back button
         Button backButton = findViewById(R.id.backButton);
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private void startDance() {
         if (!isDancing) { // Ensure we're not already dancing
             isDancing = true; // Set dancing flag
+            toggleButton.setText("Stop"); // Change button text to "Stop Dancing"
 
             // Reset video to the start and play it from the beginning
             videoView.seekTo(0);
@@ -71,22 +76,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (!isDancing) { // Stop dancing if not in progress
-                    return;
+                    Log.d("DanceRoutine", "Dancing stopped. Exiting dance routine.");
+                    return; // Stop further movements
                 }
 
                 if (turnRight) {
                     RobotApi.getInstance().turnRight(0, 40, mMotionListener);
+                    RobotApi.getInstance().moveHead(0, "relative", "relative", 0, -30, mMotionListener);
+                    //RobotApi.getInstance().moveHead(0, "relative", "relative", 0, 10, mMotionListener);
                     Log.d("DanceRoutine", "Turning Right");
                 } else {
                     RobotApi.getInstance().turnLeft(0, 40, mMotionListener);
+                   // RobotApi.getInstance().moveHead(0, "relative", "relative", 0, -10, mMotionListener);
+                    RobotApi.getInstance().moveHead(0, "relative", "relative", 0, 30, mMotionListener);
                     Log.d("DanceRoutine", "Turning Left");
                 }
 
                 // Toggle direction for next iteration
                 turnRight = !turnRight;
 
-                // Schedule next movement after 2 seconds
-                handler.postDelayed(this, interval);
+                // Schedule next movement after 2 seconds, only if still dancing
+                if (isDancing) {
+                    handler.postDelayed(this, interval);
+                }
             }
         });
     }
@@ -108,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
     private void stopDance() {
         showToast("Stop Dancing");
         isDancing = false; // Reset the dancing flag
+        toggleButton.setText("Start Dancing"); // Change button text to "Start Dancing"
 
         if (videoView.isPlaying()) {
             videoView.pause();  // Pause the video if it's playing
@@ -115,14 +128,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         stopMovement();
+
+        // Ensure the handler stops posting movement commands
         if (handler != null) {
-            handler.removeCallbacksAndMessages(null);
-            handler = null; // Clear handler reference
+            handler.removeCallbacksAndMessages(null); // Remove all callbacks
         }
     }
 
     private void stopMovement() {
-        RobotApi.getInstance().stopMove(0, mMotionListener);
+        RobotApi.getInstance().stopMove(0, mMotionListener); // Ensure robot stops moving immediately
     }
 
     // Show toast message
